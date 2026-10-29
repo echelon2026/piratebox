@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+mobile/
+*.egg-info/
+dist/
+build/
+.env
+~/.piratebox/

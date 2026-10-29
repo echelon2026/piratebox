@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "description": "PirateBox command vocabulary. This file is the single source of truth for which commands exist, their parameters and their ranges. The bridge validates every inbound command against it; anything not listed under 'commands' is rejected. The phone app and AI interpreter should load this same file.",
+  "message_format": {
+    "command": "string, required - a key of 'commands'",
+    "parameters": "object, optional - must match the command's parameter spec exactly (no extra keys)",
+    "confirmed": "boolean, optional - must be true for commands with requires_confirmation",
+    "request_id": "string, optional - echoed back in the result for correlation"
+  },
+  "commands": {
+    "set_tempo": {
+      "description": "Set the project tempo.",
+      "parameters": {
+        "bpm": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 300,
+          "decimals": 3
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.1"
+    },
+    "play": {
+      "description": "Start playback. Does nothing if already playing.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.1"
+    },
+    "stop": {
+      "description": "Stop playback (and recording).",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.1"
+    },
+    "record": {
+      "description": "Start recording: arm record if not armed, then start playback if not playing.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.1"
+    },
+    "go_to_start": {
+      "description": "Move the playhead to the start of the song/pattern.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.1"
+    },
+    "undo": {
+      "description": "Undo the last action in FL Studio.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "redo": {
+      "description": "Redo the last undone action.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "save": {
+      "description": "Save the project (like Ctrl+S). An untitled project opens FL's Save As dialog on screen.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "toggle_metronome": {
+      "description": "Switch the metronome on if off, off if on.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "set_metronome": {
+      "description": "Switch the metronome explicitly on or off.",
+      "parameters": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "open_mixer": {
+      "description": "Show and focus the mixer window.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.2"
+    },
+    "open_channel_rack": {
+      "description": "Show and focus the channel rack.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "open_piano_roll": {
+      "description": "Show and focus the piano roll for the selected channel.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "next_pattern": {
+      "description": "Switch to the next pattern.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "previous_pattern": {
+      "description": "Switch to the previous pattern.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "duplicate_pattern": {
+      "description": "Make a copy of the current pattern and switch to it.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "mute_track": {
+      "description": "Mute or unmute a mixer track (0 = master, 1-125 = inserts).",
+      "parameters": {
+        "track": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 125
+        },
+        "muted": {
+          "type": "boolean"
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "solo_track": {
+      "description": "Solo or unsolo a mixer track (0 = master, 1-125 = inserts).",
+      "parameters": {
+        "track": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 125
+        },
+        "solo": {
+          "type": "boolean"
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "select_track": {
+      "description": "Select a mixer track (0 = master, 1-125 = inserts).",
+      "parameters": {
+        "track": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 125
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "volume_up": {
+      "description": "Raise a mixer track's fader a small step (about 1.5 dB near 0 dB).",
+      "parameters": {
+        "track": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 125
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "volume_down": {
+      "description": "Lower a mixer track's fader a small step (about 1.5 dB near 0 dB).",
+      "parameters": {
+        "track": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 125
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "go_back_bars": {
+      "description": "Move the playhead back by a number of bars.",
+      "parameters": {
+        "bars": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "go_forward_bars": {
+      "description": "Move the playhead forward by a number of bars.",
+      "parameters": {
+        "bars": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "quantize": {
+      "description": "Quick-quantize the notes of the selected channel in the current pattern.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "select_channel": {
+      "description": "Select one channel in the channel rack by its position (1 = top).",
+      "parameters": {
+        "channel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
+        }
+      },
+      "requires_confirmation": false,
+      "since": "0.5"
+    },
+    "get_status": {
+      "description": "Diagnostics: check FL Studio is reachable and return its current state.",
+      "parameters": {},
+      "requires_confirmation": false,
+      "since": "0.1"
+    }
+  },
+  "planned": [
+    "add_plugin"
+  ],
+  "status_codes": {
+    "OK": "Command executed and confirmed.",
+    "PARSE_FAILED": "Input text could not be understood as a command.",
+    "INVALID_MESSAGE": "Message was not a valid command object.",
+    "UNKNOWN_COMMAND": "Command is not in the whitelist (or is planned but not yet enabled).",
+    "INVALID_PARAMETERS": "Missing, extra or wrongly-typed parameters.",
+    "OUT_OF_RANGE": "A parameter was outside its allowed range.",
+    "CONFIRMATION_REQUIRED": "Command needs 'confirmed': true.",
+    "FL_NOT_CONNECTED": "The MIDI link ports to FL Studio could not be opened.",
+    "FL_TIMEOUT": "FL Studio did not answer (not running, or controller script not active).",
+    "FL_REJECTED": "The FL Studio script rejected the request (unknown opcode or bad arguments).",
+    "FL_EXEC_ERROR": "The FL Studio script raised an error executing the request.",
+    "FL_VERSION_MISMATCH": "Bridge and FL Studio script speak different link protocol versions.",
+    "NOT_CONFIRMED": "FL Studio acknowledged, but its reported state does not match the requested change.",
+    "NO_EFFECT": "Valid command, but there was nothing to act on (e.g. nothing to undo).",
+    "NEEDS_CLARIFICATION": "The AI couldn't map the request to a command; 'message' says what to try instead.",
+    "AI_UNAVAILABLE": "The AI interpreter could not be used (no key, no internet, service error). Exact commands still work.",
+    "INTERNAL_ERROR": "Unexpected bridge error (see logs)."
+  }
+}

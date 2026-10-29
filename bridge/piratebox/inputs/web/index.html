@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e0f11">
+<title>PirateBox Test Client</title>
+<style>
+  :root {
+    --bg: #0e0f11; --panel: #17191c; --panel-2: #1f2226; --line: #2b2f35;
+    --text: #e8eaed; --dim: #8b919a; --accent: #f5a524;
+    --ok: #3ecf8e; --bad: #ff5c5c; --rec: #ff3b3b; --play: #3ecf8e;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  h1 { font-size: 15px; letter-spacing: .14em; text-transform: uppercase; margin: 0; color: var(--dim); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border-radius: 999px;
+    background: var(--panel); border: 1px solid var(--line); color: var(--dim); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
+  .pill.ok .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .pill.ok { color: var(--text); }
+  .pill.bad .dot { background: var(--bad); }
+
+  .display { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; margin-bottom: 14px; }
+  .tempo { font: 600 56px/1 ui-monospace, "SF Mono", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .tempo small { font-size: 14px; color: var(--dim); margin-left: 6px; letter-spacing: .1em; }
+  .leds { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .led { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--dim);
+    display: flex; align-items: center; gap: 6px; }
+  .led::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+  .led.on.play::before { background: var(--play); box-shadow: 0 0 8px var(--play); }
+  .led.on.rec::before { background: var(--rec); box-shadow: 0 0 8px var(--rec); }
+  .led.on.met::before { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .led.on.unsaved::before { background: var(--dim); }
+  .led.on { color: var(--text); }
+
+  .label { font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--dim);
+    text-transform: uppercase; margin: 16px 2px 8px; }
+  .grid { display: grid; gap: 8px; }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  button { appearance: none; border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+    border-radius: 12px; min-height: 58px; font: 700 13px/1.1 system-ui, sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; cursor: pointer; touch-action: manipulation; transition: transform .06s, background .15s; }
+  button:active { transform: scale(.97); background: var(--line); }
+  button:disabled { opacity: .5; }
+  button.play { color: var(--play); }
+  button.rec { color: var(--rec); }
+  button.bpm { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 17px; letter-spacing: 0; }
+  button.bpm span { display: block; font: 700 10px system-ui; color: var(--dim); letter-spacing: .12em; margin-top: 3px; }
+
+  form { display: flex; gap: 8px; }
+  input { flex: 1; min-width: 0; min-height: 50px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); font: 16px system-ui, sans-serif; }
+  input:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  form button { min-height: 50px; padding: 0 18px; background: var(--accent); color: #111; border-color: var(--accent); }
+
+  .result { margin-top: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 14px; min-height: 48px; font-weight: 600; }
+  .result.ok { border-color: color-mix(in srgb, var(--ok) 50%, var(--line)); }
+  .result.bad { border-color: color-mix(in srgb, var(--bad) 60%, var(--line)); }
+  .result.ask { border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); }
+  .result .code { font: 600 11px ui-monospace, monospace; color: var(--dim); display: block; margin-top: 2px; }
+  details { margin-top: 10px; color: var(--dim); font-size: 13px; }
+  pre { white-space: pre-wrap; word-break: break-word; font: 12px/1.45 ui-monospace, monospace; color: var(--dim);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; max-height: 260px; overflow: auto; }
+  .token { display: none; margin-bottom: 14px; }
+  .token.show { display: flex; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>PirateBox</h1>
+    <span class="pill" id="conn"><span class="dot"></span><span id="conn-text">Connecting</span></span>
+  </header>
+
+  <form class="token" id="token-form">
+    <input id="token-input" placeholder="Pairing token (printed by PirateBox)" autocomplete="off">
+    <button>Pair</button>
+  </form>
+
+  <section class="display" aria-live="polite">
+    <div class="tempo"><span id="tempo">---.-</span><small>BPM</small></div>
+    <div class="leds">
+      <span class="led play" id="led-play">PLAY</span>
+      <span class="led rec" id="led-rec">REC</span>
+      <span class="led met" id="led-met">CLICK</span>
+      <span class="led unsaved" id="led-unsaved">UNSAVED</span>
+    </div>
+  </section>
+
+  <div class="label">Transport</div>
+  <div class="grid g4">
+    <button class="play" data-cmd='{"command":"play"}'>Play</button>
+    <button data-cmd='{"command":"stop"}'>Stop</button>
+    <button class="rec" data-cmd='{"command":"record"}'>Rec</button>
+    <button data-cmd='{"command":"go_to_start"}'>|&lt; Start</button>
+  </div>
+
+  <div class="label">Tempo</div>
+  <div class="grid g3">
+    <button class="bpm" data-cmd='{"command":"set_tempo","parameters":{"bpm":140}}'>140<span>BPM</span></button>
+    <button class="bpm" data-cmd='{"command":"set_tempo","parameters":{"bpm":142}}'>142<span>BPM</span></button>
+    <button class="bpm" data-cmd='{"command":"set_tempo","parameters":{"bpm":150}}'>150<span>BPM</span></button>
+  </div>
+
+  <div class="label">Edit</div>
+  <div class="grid g4">
+    <button data-cmd='{"command":"undo"}'>Undo</button>
+    <button data-cmd='{"command":"redo"}'>Redo</button>
+    <button data-cmd='{"command":"save"}'>Save</button>
+    <button data-cmd='{"command":"toggle_metronome"}'>Click</button>
+  </div>
+  <div class="grid g4" style="margin-top:8px">
+    <button data-cmd='{"command":"open_mixer"}'>Mixer</button>
+  </div>
+
+  <div class="label">Type a command</div>
+  <form id="text-form">
+    <input id="text" placeholder="make it 142, let's hear it…" autocomplete="off" autocapitalize="none" enterkeyhint="send">
+    <button>Send</button>
+  </form>
+
+  <div class="result" id="result">Ready.</div>
+  <details><summary>Last response</summary><pre id="raw">—</pre></details>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let token = new URLSearchParams(location.hash.slice(1)).get("token") || "";
+  let busy = false;
+
+  function showTokenForm(show) { $("token-form").classList.toggle("show", show); }
+  showTokenForm(!token);
+
+  async function send(msg) {
+    const res = await fetch("/api/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-PirateBox-Token": token },
+      body: JSON.stringify(msg),
+    });
+    const body = await res.json();
+    if (res.status === 401) showTokenForm(true);
+    return body;
+  }
+
+  function setConn(ok, text) {
+    $("conn").className = "pill " + (ok ? "ok" : "bad");
+    $("conn-text").textContent = text;
+  }
+
+  function render(state) {
+    if (!state) return;
+    $("tempo").textContent = Number(state.tempo).toFixed(1);
+    $("led-play").classList.toggle("on", state.playing);
+    $("led-rec").classList.toggle("on", state.recording);
+    $("led-met").classList.toggle("on", state.metronome);
+    $("led-unsaved").classList.toggle("on", state.unsaved_changes);
+  }
+
+  function showResult(r) {
+    const el = $("result");
+    el.className = "result " + (r.success ? "ok" : r.requires_clarification ? "ask" : "bad");
+    el.textContent = r.message || r.status;
+    const code = document.createElement("span");
+    code.className = "code";
+    code.textContent = r.status + (r.request_id ? "  ·  " + r.request_id : "");
+    el.appendChild(code);
+    $("raw").textContent = JSON.stringify(r, null, 2);
+    render(r.state);
+  }
+
+  async function run(msg) {
+    if (busy) return;
+    busy = true;
+    document.querySelectorAll("button").forEach((b) => (b.disabled = true));
+    try {
+      showResult(await send(msg));
+    } catch (e) {
+      showResult({ success: false, status: "BRIDGE_UNREACHABLE", message: "Cannot reach PirateBox" });
+      setConn(false, "Bridge offline");
+    } finally {
+      busy = false;
+      document.querySelectorAll("button").forEach((b) => (b.disabled = false));
+    }
+  }
+
+  document.querySelectorAll("button[data-cmd]").forEach((b) =>
+    b.addEventListener("click", () => run({ type: "command", ...JSON.parse(b.dataset.cmd) })));
+
+  $("text-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("text").value.trim();
+    if (text) run({ type: "text", text });
+  });
+
+  $("token-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    token = $("token-input").value.trim();
+    history.replaceState(null, "", "#token=" + encodeURIComponent(token));
+    showTokenForm(false);
+    poll();
+  });
+
+  async function poll() {
+    if (!busy && token) {
+      try {
+        const s = await send({ type: "status" });
+        if (s.status === "UNAUTHORIZED") setConn(false, "Not paired");
+        else if (s.connected) { setConn(true, "FL Studio ready"); render(s.state); }
+        else setConn(false, s.status === "FL_TIMEOUT" ? "FL not responding" : "FL not connected");
+      } catch { setConn(false, "Bridge offline"); }
+    } else if (!token) setConn(false, "Not paired");
+  }
+  poll();
+  setInterval(poll, 2000);
+})();
+</script>
+</body>
+</html>
